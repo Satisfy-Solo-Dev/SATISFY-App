@@ -1,21 +1,18 @@
-name: Build SATISFY APK
+name: SATISFY Studio Android Build
 
 on:
-  workflow_dispatch:
   push:
-    branches:
-      - main
-
-permissions:
-  contents: read
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
 
 jobs:
   build:
-    name: Build Android APK
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Set up Java 17
@@ -26,25 +23,19 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
-        with:
-          packages: platform-tools
 
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.13'
-
-      - name: Install Android SDK components
+      - name: Install Android SDK Components
         run: |
-          sdkmanager "platforms;android-36"
-          sdkmanager "build-tools;36.0.0"
+          sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"
 
-      - name: Build APK
-        run: gradle --no-daemon assembleDebug
+      - name: Build SATISFY Studio APK
+        run: |
+          chmod +x ./gradlew
+          ./gradlew --no-daemon assembleDebug
 
-      - name: Upload APK
+      - name: Upload SATISFY Studio APK
         uses: actions/upload-artifact@v4
         with:
-          name: SATISFY-Android-APK
+          name: SATISFY-Studio-APK
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
